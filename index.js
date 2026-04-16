@@ -10,12 +10,16 @@ app.get('/status', (req, res) => {
         port: 27040,
         socketTimeout: 5000
     }).then((state) => {
+        // Збираємо тільки імена гравців, які не пусті (прибираємо ботів, якщо треба)
+        const playerNames = state.players.map(p => p.name).filter(name => name.trim() !== "");
+
         res.json({
             status: "ok",
             name: state.name,
             map: state.map,
             online: state.players.length,
-            max: state.maxplayers
+            max: state.maxplayers,
+            players: playerNames // Додаємо список імен
         });
     }).catch((error) => {
         res.json({ status: "error", message: "offline" });

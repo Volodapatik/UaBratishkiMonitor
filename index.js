@@ -3,6 +3,13 @@ const { GameDig } = require('gamedig');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return h > 0 ? `${h}г ${m}хв` : `${m}хв ${s}с`;
+}
+
 app.get('/status', (req, res) => {
     GameDig.query({
         type: 'counterstrike16',
@@ -10,8 +17,12 @@ app.get('/status', (req, res) => {
         port: 27040,
         socketTimeout: 5000
     }).then((state) => {
-        // Збираємо тільки імена гравців, які не пусті (прибираємо ботів, якщо треба)
-        const playerNames = state.players.map(p => p.name).filter(name => name.trim() !== "");
+        const playersData = state.players
+            .filter(p => p.name && p.name.trim() !== "")
+            .map(p => ({
+                name: p.name,
+                time: formatTime(p.raw.time || p.time || 0)
+            }));
 
         res.json({
             status: "ok",
@@ -19,7 +30,7 @@ app.get('/status', (req, res) => {
             map: state.map,
             online: state.players.length,
             max: state.maxplayers,
-            players: playerNames // Додаємо список імен
+            players: playersData
         });
     }).catch((error) => {
         res.json({ status: "error", message: "offline" });

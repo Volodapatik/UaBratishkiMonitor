@@ -1,4 +1,3 @@
-// Version: 1.0.5-final-fix
 const express = require('express');
 const { GameDig } = require('gamedig');
 const app = express();
@@ -8,7 +7,7 @@ function formatTime(seconds) {
     if (!seconds && seconds !== 0) return "0хв";
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}г ${m}хв` : `${m}хв`;
+    return h > 0 ? h + "г " + m + "хв" : m + "хв";
 }
 
 app.get('/status', (req, res) => {
@@ -19,7 +18,7 @@ app.get('/status', (req, res) => {
         socketTimeout: 5000
     }).then((state) => {
         const playersData = state.players
-            .filter(p => p.name)
+            .filter(p => p.name && p.name.trim() !== "")
             .map(p => ({
                 name: p.name,
                 time: formatTime(p.raw.time || p.time || 0)
@@ -37,4 +36,4 @@ app.get('/status', (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`API Ready`));
+app.listen(PORT, () => console.log('API is Running'));

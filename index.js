@@ -1,3 +1,4 @@
+// Version: 1.0.5-final-fix
 const express = require('express');
 const { GameDig } = require('gamedig');
 const app = express();
@@ -36,4 +37,4 @@ app.get('/status', (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`API Ready` trial));
+app.listen(PORT, () => console.log(`API Ready`));
